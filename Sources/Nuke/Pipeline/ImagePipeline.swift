@@ -13,14 +13,17 @@ import UIKit
 import AppKit
 #endif
 
-/// The pipeline downloads and caches images, and prepares them for display. 
+/// The pipeline downloads and caches images, and prepares them for display.
 public final class ImagePipeline: @unchecked Sendable {
     /// Returns the shared image pipeline.
+    // memo: sharedで共有インスタンスを管理しているが、initは公開されていてインスタンスの差し替えが可能
+    // テスト容易性のため？
     public static var shared: ImagePipeline {
         get { _shared.value }
         set { _shared.value = newValue }
     }
 
+    // memo: レースコンディション対策としてAtomicでラップしているので、ImagePipelineは @unchecked Sendableになっている
     private static let _shared = Atomic(value: ImagePipeline(configuration: .withURLCache))
 
     /// The pipeline configuration.
