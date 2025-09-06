@@ -123,6 +123,8 @@ public struct ImageRequest: CustomStringConvertible, Sendable, ExpressibleByStri
         options: Options = [],
         userInfo: [UserInfoKey: Any]? = nil
     ) {
+        // memo: CoW(Copy-on_Write)
+        // Container（class）で各プロパティをラップすることで、必要なタイミングまでコピーを送らせて変数への代入などでは参照の共有だけで済むようにする
         self.ref = Container(
             resource: Resource.url(url),
             processors: processors,
@@ -440,6 +442,7 @@ public struct ImageRequest: CustomStringConvertible, Sendable, ExpressibleByStri
 
     private var ref: Container
 
+    // プロパティを変更するときは、Containerをコピーすることで参照を共有元に影響が出ないようにする
     private mutating func mutate(_ closure: (Container) -> Void) {
         if !isKnownUniquelyReferenced(&ref) {
             ref = Container(ref)
